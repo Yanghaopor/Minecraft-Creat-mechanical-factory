@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " BE",
+    " PB",
+    "P  "
+  ],
+  "key": {
+    "B": { "item": "create:brass_sheet" },
+    "E": { "item": "minecraft:ender_pearl" },
+    "P": { "item": "create:precision_mechanism" }
+  },
+  "result": {
+    "id": "examplemod:construction_key",
+    "count": 1
+  }
+}

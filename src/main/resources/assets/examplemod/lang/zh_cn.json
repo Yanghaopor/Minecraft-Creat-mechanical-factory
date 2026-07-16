@@ -1,0 +1,15 @@
+{
+  "itemGroup.examplemod.construction": "\u65bd\u5de5\u65b9\u5757",
+  "block.examplemod.construction_block": "\u65bd\u5de5\u65b9\u5757",
+  "block.examplemod.construction_shell": "\u65bd\u5de5\u8231\u58c1",
+  "block.examplemod.construction_interface": "\u65bd\u5de5\u63a5\u53e3",
+  "block.examplemod.exit_console": "\u65bd\u5de5\u8231\u51fa\u53e3",
+  "item.examplemod.construction_key": "\u65bd\u5de5\u94a5\u5319",
+  "message.examplemod.construction.not_empty": "\u65bd\u5de5\u8231\u5185\u4ecd\u6709\u73a9\u5bb6\u3001\u7269\u54c1\u6216\u65b9\u5757\uff0c\u65e0\u6cd5\u64a4\u573a\u3002",
+  "message.examplemod.construction.host_missing": "\u5173\u8054\u7684\u65bd\u5de5\u65b9\u5757\u4e0d\u53ef\u7528\u3002",
+  "message.examplemod.construction.dimension_unavailable": "\u65bd\u5de5\u7ef4\u5ea6\u4e0d\u53ef\u7528\u3002",
+  "message.examplemod.construction.occupied": "\u65bd\u5de5\u8231\u5185\u4ecd\u6709\u73a9\u5bb6\uff0c\u65e0\u6cd5\u8fc1\u79fb\u3002",
+  "message.examplemod.construction.migration_invalid": "\u8be5\u5de5\u5382\u7684\u8fc1\u79fb\u51ed\u8bc1\u5df2\u5931\u6548\uff0c\u6216\u5de5\u5382\u5df2\u5728\u5176\u4ed6\u4f4d\u7f6e\u90e8\u7f72\u3002",
+  "tooltip.examplemod.construction.migration": "\u5df2\u7ed1\u5b9a\u552f\u4e00\u5de5\u5382\u00b7\u53ef\u8fc1\u79fb",
+  "tooltip.examplemod.construction.migration_warning": "\u6389\u843d\u7269\u88ab\u9500\u6bc1\u65f6\uff0c\u8231\u5185\u5185\u5bb9\u4e5f\u4f1a\u6c38\u4e45\u9500\u6bc1"
+}

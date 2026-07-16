@@ -1,0 +1,15 @@
+{
+  "itemGroup.examplemod.construction": "Construction Block",
+  "block.examplemod.construction_block": "Construction Block",
+  "block.examplemod.construction_shell": "Construction Shell",
+  "block.examplemod.construction_interface": "Construction Interface",
+  "block.examplemod.exit_console": "Exit Console",
+  "item.examplemod.construction_key": "Construction Key",
+  "message.examplemod.construction.not_empty": "The construction room must be empty before it can be dismantled.",
+  "message.examplemod.construction.host_missing": "The linked construction block is unavailable.",
+  "message.examplemod.construction.dimension_unavailable": "The construction dimension is unavailable.",
+  "message.examplemod.construction.occupied": "A player is still inside the construction room, so it cannot be moved.",
+  "message.examplemod.construction.migration_invalid": "This factory migration token is invalid, or the factory is already deployed elsewhere.",
+  "tooltip.examplemod.construction.migration": "Bound to a unique factory - portable",
+  "tooltip.examplemod.construction.migration_warning": "Destroying this dropped item permanently destroys the room contents"
+}
