@@ -3,6 +3,7 @@ package com.example.examplemod.blockentity;
 import com.example.examplemod.construction.ConstructionPortMode;
 import com.example.examplemod.construction.ConstructionRoomManager;
 import com.example.examplemod.registry.ModBlockEntities;
+import com.example.examplemod.registry.ModBlocks;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
@@ -10,7 +11,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 
 public final class ConstructionInterfaceBlockEntity extends KineticBlockEntity {
     private ConstructionPortMode portMode = ConstructionPortMode.DISABLED;
@@ -18,6 +23,10 @@ public final class ConstructionInterfaceBlockEntity extends KineticBlockEntity {
     private float bridgedCapacity;
     private float bridgedStress;
     private boolean bridgeSourceMode;
+    @Nullable
+    private ConstructionBlockEntity lastCapabilityHost;
+    private final IItemHandler itemHandlerProxy = new InteriorItemHandlerProxy();
+    private final IFluidHandler fluidHandlerProxy = new InteriorFluidHandlerProxy();
 
     public ConstructionInterfaceBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CONSTRUCTION_INTERFACE.get(), pos, state);
@@ -26,10 +35,19 @@ public final class ConstructionInterfaceBlockEntity extends KineticBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (getLevel() instanceof ServerLevel) {
+        if (getLevel() instanceof ServerLevel level) {
             ConstructionBlockEntity host = getHost();
+            if (host != lastCapabilityHost) {
+                // Create caches adjacent capabilities. The real inventory is in
+                // another dimension, so a host unload/reload must invalidate the
+                // interface capability even though this interface never unloaded.
+                lastCapabilityHost = host;
+                level.invalidateCapabilities(getBlockPos());
+                level.updateNeighborsAt(getBlockPos(), ModBlocks.CONSTRUCTION_INTERFACE.get());
+            }
             Direction direction = getPortDirection();
-            if (host != null && direction != null && host.getPortMode(direction) == ConstructionPortMode.KINETIC_INPUT) {
+            // Check direction first, then host - order matters for compound condition
+            if (direction != null && host != null && host.getPortMode(direction) == ConstructionPortMode.KINETIC_INPUT) {
                 updateBridgeSource(host.getTheoreticalSpeed(), true);
             } else {
                 updateBridgeSource(0, false);
@@ -141,6 +159,20 @@ public final class ConstructionInterfaceBlockEntity extends KineticBlockEntity {
         return portMode;
     }
 
+    /**
+     * A stable capability object for Create's capability cache. The actual host
+     * is deliberately resolved for every operation because it lives in another
+     * dimension and its block entity can be replaced while this interface and
+     * a funnel's cached capability remain loaded.
+     */
+    public IItemHandler getItemHandlerProxy() {
+        return itemHandlerProxy;
+    }
+
+    public IFluidHandler getFluidHandlerProxy() {
+        return fluidHandlerProxy;
+    }
+
     public void setPortMode(ConstructionPortMode portMode) {
         if (this.portMode == portMode) {
             return;
@@ -151,6 +183,10 @@ public final class ConstructionInterfaceBlockEntity extends KineticBlockEntity {
         bridgedStress = 0;
         setChanged();
         sendData();
+        if (getLevel() instanceof ServerLevel level) {
+            level.invalidateCapabilities(getBlockPos());
+            level.updateNeighborsAt(getBlockPos(), ModBlocks.CONSTRUCTION_INTERFACE.get());
+        }
     }
 
     @Override
@@ -173,5 +209,101 @@ public final class ConstructionInterfaceBlockEntity extends KineticBlockEntity {
     @Nullable
     private Direction getPortDirection() {
         return getLevel() instanceof ServerLevel level ? ConstructionRoomManager.getPortDirection(level, getBlockPos()) : null;
+    }
+
+    @Nullable
+    private IItemHandler resolveItemHandler() {
+        ConstructionBlockEntity host = getHost();
+        Direction direction = getPortDirection();
+        return host == null || direction == null ? null : host.getInternalItemHandler(direction);
+    }
+
+    @Nullable
+    private IFluidHandler resolveFluidHandler() {
+        ConstructionBlockEntity host = getHost();
+        Direction direction = getPortDirection();
+        return host == null || direction == null ? null : host.getInternalFluidHandler(direction);
+    }
+
+    private final class InteriorItemHandlerProxy implements IItemHandler {
+        @Override
+        public int getSlots() {
+            IItemHandler target = resolveItemHandler();
+            return target == null ? 9 : target.getSlots();
+        }
+
+        @Override
+        public ItemStack getStackInSlot(int slot) {
+            IItemHandler target = resolveItemHandler();
+            return target == null ? ItemStack.EMPTY : target.getStackInSlot(slot);
+        }
+
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            IItemHandler target = resolveItemHandler();
+            return target == null ? stack : target.insertItem(slot, stack, simulate);
+        }
+
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            IItemHandler target = resolveItemHandler();
+            return target == null ? ItemStack.EMPTY : target.extractItem(slot, amount, simulate);
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            IItemHandler target = resolveItemHandler();
+            return target == null ? 64 : target.getSlotLimit(slot);
+        }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            IItemHandler target = resolveItemHandler();
+            return target != null && target.isItemValid(slot, stack);
+        }
+    }
+
+    private final class InteriorFluidHandlerProxy implements IFluidHandler {
+        @Override
+        public int getTanks() {
+            IFluidHandler target = resolveFluidHandler();
+            return target == null ? 1 : target.getTanks();
+        }
+
+        @Override
+        public FluidStack getFluidInTank(int tank) {
+            IFluidHandler target = resolveFluidHandler();
+            return target == null ? FluidStack.EMPTY : target.getFluidInTank(tank);
+        }
+
+        @Override
+        public int getTankCapacity(int tank) {
+            IFluidHandler target = resolveFluidHandler();
+            return target == null ? 16_000 : target.getTankCapacity(tank);
+        }
+
+        @Override
+        public boolean isFluidValid(int tank, FluidStack stack) {
+            IFluidHandler target = resolveFluidHandler();
+            return target != null && target.isFluidValid(tank, stack);
+        }
+
+        @Override
+        public int fill(FluidStack resource, FluidAction action) {
+            IFluidHandler target = resolveFluidHandler();
+            return target == null ? 0 : target.fill(resource, action);
+        }
+
+        @Override
+        public FluidStack drain(FluidStack resource, FluidAction action) {
+            IFluidHandler target = resolveFluidHandler();
+            return target == null ? FluidStack.EMPTY : target.drain(resource, action);
+        }
+
+        @Override
+        public FluidStack drain(int maxDrain, FluidAction action) {
+            IFluidHandler target = resolveFluidHandler();
+            return target == null ? FluidStack.EMPTY : target.drain(maxDrain, action);
+        }
     }
 }

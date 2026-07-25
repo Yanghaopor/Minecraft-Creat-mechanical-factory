@@ -11,6 +11,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.SignalGetter;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -85,5 +86,14 @@ public final class ConstructionInterfaceBlock extends KineticBlock implements En
         var host = ConstructionRoomManager.findHost(serverLevel, pos);
         var port = ConstructionRoomManager.getPortDirection(serverLevel, pos);
         return host != null && port != null ? host.getInternalRedstoneSignal(port) : 0;
+    }
+
+    // Same rationale as ConstructionBlock: this interior I/O face must not
+    // conduct weak power through the solid block, so interior redstone cannot
+    // leak outward through the interface and getSignal stays limited to the
+    // intended port output.
+    @Override
+    public boolean shouldCheckWeakPower(BlockState state, SignalGetter level, BlockPos pos, Direction side) {
+        return false;
     }
 }

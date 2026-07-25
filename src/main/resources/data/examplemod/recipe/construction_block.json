@@ -1,0 +1,23 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": false,
+  "pattern": [
+    " BBB ",
+    "BTCTB",
+    "BGSVB",
+    "BTCTB",
+    " BBB "
+  ],
+  "key": {
+    "B": { "item": "create:brass_casing" },
+    "T": { "item": "create:electron_tube" },
+    "C": { "item": "create:smart_chute" },
+    "G": { "item": "create:stressometer" },
+    "S": { "item": "create:item_vault" },
+    "V": { "item": "create:speedometer" }
+  },
+  "result": {
+    "id": "examplemod:construction_block",
+    "count": 1
+  }
+}

@@ -32,6 +32,15 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+### AI tools ###
+.agents/
+AGENTS.md
+CLAUDE.md
+.claude/
+.cursor/
+.cursorrules
+.kimi/
+
 ### Minecraft Modding ###
 run/
 !**/src/**/run/

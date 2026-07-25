@@ -1,13 +1,13 @@
 package com.example.examplemod.event;
 
-import com.example.examplemod.ExampleMod;
 import com.example.examplemod.block.ConstructionInterfaceBlock;
 import com.example.examplemod.blockentity.ConstructionBlockEntity;
+import com.example.examplemod.blockentity.ConstructionInterfaceBlockEntity;
+import com.example.examplemod.construction.ConstructionPortMode;
 import com.example.examplemod.construction.ConstructionRoomManager;
 import com.example.examplemod.item.ConstructionBlockItem;
 import com.example.examplemod.registry.ModBlockEntities;
 import com.example.examplemod.registry.ModBlocks;
-import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.MobSpawnType;
@@ -20,6 +20,7 @@ import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
 import net.neoforged.neoforge.event.entity.item.ItemExpireEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 public final class CommonEvents {
@@ -39,18 +40,20 @@ public final class CommonEvents {
                     || side != state.getValue(ConstructionInterfaceBlock.FACING)) {
                 return null;
             }
-            ConstructionBlockEntity host = ConstructionRoomManager.findHost(serverLevel, pos);
-            Direction port = ConstructionRoomManager.getPortDirection(serverLevel, pos);
-            return host == null || port == null ? null : host.getInternalItemHandler(port);
+            return blockEntity instanceof ConstructionInterfaceBlockEntity interfaceBlockEntity
+                    && (interfaceBlockEntity.getPortMode() == ConstructionPortMode.ITEM_INPUT
+                    || interfaceBlockEntity.getPortMode() == ConstructionPortMode.ITEM_OUTPUT)
+                    ? interfaceBlockEntity.getItemHandlerProxy() : null;
         }, ModBlocks.CONSTRUCTION_INTERFACE.get());
         event.registerBlock(Capabilities.FluidHandler.BLOCK, (level, pos, state, blockEntity, side) -> {
             if (!(level instanceof ServerLevel serverLevel) || side == null
                     || side != state.getValue(ConstructionInterfaceBlock.FACING)) {
                 return null;
             }
-            ConstructionBlockEntity host = ConstructionRoomManager.findHost(serverLevel, pos);
-            Direction port = ConstructionRoomManager.getPortDirection(serverLevel, pos);
-            return host == null || port == null ? null : host.getInternalFluidHandler(port);
+            return blockEntity instanceof ConstructionInterfaceBlockEntity interfaceBlockEntity
+                    && (interfaceBlockEntity.getPortMode() == ConstructionPortMode.FLUID_INPUT
+                    || interfaceBlockEntity.getPortMode() == ConstructionPortMode.FLUID_OUTPUT)
+                    ? interfaceBlockEntity.getFluidHandlerProxy() : null;
         }, ModBlocks.CONSTRUCTION_INTERFACE.get());
     }
 
@@ -76,7 +79,14 @@ public final class CommonEvents {
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
-        ConstructionRoomManager.cleanupOrphanedRooms(event.getServer());
+        ConstructionRoomManager.resetTransientState();
+    }
+
+    @SubscribeEvent
+    public static void onServerStopping(ServerStoppingEvent event) {
+        // Do not touch DistanceManager or teleport players while worlds are
+        // being saved. Only release static references owned by this mod.
+        ConstructionRoomManager.resetTransientState();
     }
 
     @SubscribeEvent
@@ -84,7 +94,7 @@ public final class CommonEvents {
         ConstructionRoomManager.tickActiveRooms(event.getServer());
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
         if (event.getState().is(ModBlocks.CONSTRUCTION_SHELL.get())
                 || event.getState().is(ModBlocks.CONSTRUCTION_INTERFACE.get())
@@ -98,11 +108,31 @@ public final class CommonEvents {
                 && !blockEntity.canDismantle(serverLevel)) {
             event.setCanceled(true);
             event.getPlayer().displayClientMessage(net.minecraft.network.chat.Component.translatable("message.examplemod.construction.not_empty"), true);
+            return;
+        }
+        if (event.getState().is(ModBlocks.CONSTRUCTION_BLOCK.get())
+                && event.getLevel() instanceof ServerLevel
+                && event.getLevel().getBlockEntity(event.getPos()) instanceof ConstructionBlockEntity blockEntity) {
+            // BreakEvent still has the host block entity available. Tear down
+            // the room here, before vanilla replaces the block and discards
+            // that entity. ConstructionBlock#onRemove keeps the same cleanup
+            // as a fallback for explosions, commands, and other removal paths.
+            blockEntity.onHostRemoved();
         }
     }
 
     @SubscribeEvent
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            // Cross-dimension teleporting from a logout callback races world
+            // saving and Sable's sub-level shutdown. A returning player is
+            // recovered after login, when the connection and levels are live.
+            ConstructionRoomManager.cancelPendingEntry(player.getUUID());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player
                 && player.level().dimension().equals(ConstructionRoomManager.CONSTRUCTION_DIMENSION)) {
             ConstructionRoomManager.exit(player, player.blockPosition());

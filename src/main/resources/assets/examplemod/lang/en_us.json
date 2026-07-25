@@ -1,5 +1,5 @@
 {
-  "itemGroup.examplemod.construction": "Construction Block",
+  "itemGroup.examplemod.construction": "Mechanical Factory",
   "block.examplemod.construction_block": "Construction Block",
   "block.examplemod.construction_shell": "Construction Shell",
   "block.examplemod.construction_interface": "Construction Interface",
@@ -7,9 +7,22 @@
   "item.examplemod.construction_key": "Construction Key",
   "message.examplemod.construction.not_empty": "The construction room must be empty before it can be dismantled.",
   "message.examplemod.construction.host_missing": "The linked construction block is unavailable.",
+  "message.examplemod.construction.host_relocated": "Factory host was moved or is at an abnormal coordinate; returned to last entry point.",
+  "message.examplemod.construction.host_unreachable": "Factory host is unreachable; returned to world spawn.",
   "message.examplemod.construction.dimension_unavailable": "The construction dimension is unavailable.",
   "message.examplemod.construction.occupied": "A player is still inside the construction room, so it cannot be moved.",
   "message.examplemod.construction.migration_invalid": "This factory migration token is invalid, or the factory is already deployed elsewhere.",
   "tooltip.examplemod.construction.migration": "Bound to a unique factory - portable",
-  "tooltip.examplemod.construction.migration_warning": "Destroying this dropped item permanently destroys the room contents"
+  "tooltip.examplemod.construction.migration_warning": "Keep this item on you or place it. If it is destroyed or lost, the room and its contents are permanently destroyed",
+  "hud.examplemod.construction.port_type": "Current port: %s",
+  "port_mode.examplemod.disabled": "Disabled",
+  "port_mode.examplemod.kinetic_input": "Kinetic Input",
+  "port_mode.examplemod.kinetic_output": "Kinetic Output",
+  "port_mode.examplemod.item_input": "Item Input",
+  "port_mode.examplemod.item_output": "Item Output",
+  "port_mode.examplemod.fluid_input": "Fluid Input",
+  "port_mode.examplemod.fluid_output": "Fluid Output",
+  "port_mode.examplemod.redstone_input": "Redstone Input",
+  "port_mode.examplemod.redstone_output": "Redstone Output",
+  "port_mode.examplemod.unload": "Unload (pauses when redstone active)"
 }

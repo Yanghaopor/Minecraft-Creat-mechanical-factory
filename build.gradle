@@ -40,7 +40,7 @@ repositories {
 }
 
 base {
-    archivesName = mod_id
+    archivesName = 'mechanical_factory'
 }
 
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
@@ -133,12 +133,22 @@ dependencies {
     compileOnly("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") {
         transitive = false
     }
+    // Create's kinetic block-entity API exposes a Ponder type in its public hierarchy.
+    // The API remains compile-only; this mod no longer registers Ponder scenes.
     compileOnly("net.createmod.ponder:ponder-neoforge:${ponder_version}") {
         transitive = false
     }
     localRuntime("com.simibubi.create:create-${minecraft_version}:${create_version}") {
         transitive = false
     }
+
+    // Sable is the physics backend Create: Aeronautics flies its airships on. A factory
+    // deployed onto a moving airship keeps a stable BlockPos inside the airship's moving
+    // sub-level; we use reflection to call Sable's companion API to project that stored
+    // position through the sub-level's live transform so exiting a factory steps out
+    // onto the ship wherever it has flown. Reflection-guarded, so Sable stays a pure
+    // soft dependency: without it installed, the resolver class falls back to the
+    // stored host/entry position.
 
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

@@ -13,6 +13,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.SignalGetter;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -42,7 +43,7 @@ public final class ConstructionBlock extends KineticBlock implements EntityBlock
     @Override
     public boolean hasShaftTowards(LevelReader level, BlockPos pos, BlockState state, Direction face) {
         return level.getBlockEntity(pos) instanceof ConstructionBlockEntity blockEntity
-                && blockEntity.getPortMode(face).isKinetic();
+                && blockEntity.hasExternalKineticConnection(face);
     }
 
     @Nullable
@@ -119,5 +120,19 @@ public final class ConstructionBlock extends KineticBlock implements EntityBlock
     @Override
     protected int getDirectSignal(BlockState state, BlockGetter level, BlockPos pos, Direction side) {
         return getSignal(state, level, pos, side);
+    }
+
+    // The construction block is a dedicated redstone I/O face, not a passive
+    // conductor. The default (isRedstoneConductor == true for a full solid
+    // block) makes SignalGetter#getSignal return max(own output, direct signal
+    // received from any neighbour), so a strongly powered input (repeater, lever,
+    // comparator, observer into an input face) leaks through the block as weak
+    // power on every face and makes output ports read powered regardless of the
+    // real interior/exterior signal. Returning false keeps getSignal to the
+    // intended port output only; input reading is unaffected because it reads
+    // the neighbour's emitted signal, not weak power through this block.
+    @Override
+    public boolean shouldCheckWeakPower(BlockState state, SignalGetter level, BlockPos pos, Direction side) {
+        return false;
     }
 }

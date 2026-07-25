@@ -1,6 +1,21 @@
-# Minecraft 1.21.1 NeoForge Mod Template
+# Mechanical Factory
 
-这是一个基于官方 ModDevGradle MDK 的 NeoForge 模组工程。它为 Create 产线提供可进入的 16x16x16 施工舱，将大型机器收纳到外部一个方块中。
+A NeoForge mod for Minecraft 1.21.1 that collapses an entire Create production line into a single block.
+
+Mechanical Factory gives every Create contraption a place to live. Place a Construction Block in the world and step inside with a Construction Key to enter a private, persistent 16x16x16 factory room hosted in its own pocket dimension. Build your machinery there, then seal it back up - the whole factory stays loaded and keeps running on the server even when no one is inside.
+
+Each of the block's six faces can be configured as a port that bridges straight into the room:
+
+- **Kinetic** - input or output rotation; Create's stress and speed are mirrored across the dimensional boundary, so an exterior shaft can drive interior machinery or vice versa.
+- **Items** - a 9-slot buffer per face, with input and output sides reversed between the outside and the inside.
+- **Fluids** - a 16,000 mB buffer per face.
+- **Redstone** - read or emit signals through any face.
+
+When it is time to move, sneak-wrench the host to fold the entire factory (room, ports, buffers and all) into a single, uniquely-bound portable item. Place it down elsewhere and everything snaps back exactly as it was. Destroy that dropped item, though, and the room's contents are gone for good. Empty rooms can be cleanly dismantled, and the blast-resistant shell keeps your machinery safe.
+
+Requires Create 6.0.10 or a compatible release.
+
+> 这是一个基于官方 ModDevGradle MDK 的 NeoForge 模组工程。它为 Create 产线提供可进入的 16x16x16 施工舱，将大型机器收纳到外部一个方块中。
 
 | Component | Version |
 | --- | --- |

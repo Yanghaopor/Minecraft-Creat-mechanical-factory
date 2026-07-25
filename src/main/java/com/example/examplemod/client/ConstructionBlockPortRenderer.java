@@ -14,7 +14,9 @@ public final class ConstructionBlockPortRenderer implements BlockEntityRenderer<
     public void render(ConstructionBlockEntity blockEntity, float partialTick, PoseStack poseStack,
             MultiBufferSource buffers, int packedLight, int packedOverlay) {
         for (Direction direction : Direction.values()) {
-            PortFaceOverlayRenderer.render(direction, blockEntity.getPortMode(direction), poseStack, buffers, packedOverlay);
+            PortFaceOverlayRenderer.renderStatusPanel(direction, blockEntity.getPortMode(direction), poseStack, buffers,
+                    packedOverlay);
         }
+        PortFaceOverlayRenderer.renderBlockCorners(blockEntity, poseStack, buffers, packedOverlay);
     }
 }
