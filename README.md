@@ -69,6 +69,8 @@ Requires Create 6.0.10 or a compatible release.
 
 ## References
 
+Special thanks to mMuzi for assisting with textures.
+
 - NeoForge documentation: https://docs.neoforged.net/
 - ModDevGradle: https://github.com/neoforged/ModDevGradle
 - Mojang mappings license: https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
