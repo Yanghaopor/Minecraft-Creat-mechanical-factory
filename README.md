@@ -25,14 +25,6 @@ Requires Create 6.0.10 or a compatible release.
 | Java | 21 |
 | Gradle Wrapper | 9.2.1 |
 
-## First Setup
-
-1. 安装 JDK 21，并确认 `java -version` 可以正常执行。
-2. 在 `gradle.properties` 中修改 `mod_id`、`mod_name`、`mod_group_id`、`mod_authors`、`mod_description` 和 `mod_license`。
-3. 若要更换模组标识，请同步修改 `mod_id`、`ExampleMod.MOD_ID`、Java 包名，以及 `src/main/resources/assets/examplemod` 和 `src/main/resources/data/examplemod`。
-
-`mod_id` 必须只使用小写英文字母、数字和下划线，且以字母开头。
-
 ## Common Commands
 
 在 Windows PowerShell 中执行：
