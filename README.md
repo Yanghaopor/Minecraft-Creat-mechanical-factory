@@ -74,3 +74,33 @@ Special thanks to mMuzi for assisting with textures.
 - NeoForge documentation: https://docs.neoforged.net/
 - ModDevGradle: https://github.com/neoforged/ModDevGradle
 - Mojang mappings license: https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+
+
+## Developers & Contributors / 开发者与贡献者
+
+Mechanical Factory is developed and maintained by the following contributors:
+
+- **Yanghaopor** — Original Author & Developer（原作者、开发者）
+  - GitHub: https://github.com/Yanghaopor
+- **xiaofa520** — Developer & Contributor（开发者、贡献者）
+
+Special thanks to **mMuzi** for assisting with textures.
+
+## MC百科开发者身份认证
+
+本项目为 Mechanical Factory（机械工厂）的官方开源代码仓库。
+
+项目开发者及贡献者包括：
+
+- **Yanghaopor**：项目原作者、开发者。
+- **xiaofa520**：项目开发者、贡献者。
+
+上述人员参与 Mechanical Factory 模组的开发与维护。
+
+本声明用于 MC百科（mcmod.cn）开发者身份认证，以确认上述人员与本项目的关联关系。
+
+项目源代码：
+https://github.com/Yanghaopor/Minecraft-Creat-mechanical-factory
+
+模组发布页面：
+https://modrinth.com/mod/mechanical-factory
